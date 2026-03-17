@@ -1,63 +1,96 @@
 # codeScanner Setup Script for Windows
-# This script automates the creation of a virtual environment and installation of dependencies.
+# Handles standard Python installs and Windows Store Python
 
 Write-Host "Starting codeScanner setup..." -ForegroundColor Cyan
 
-# Check for Python
+# ─────────────────────────────────────────────
+# Step 1: Find a working Python executable
+# ─────────────────────────────────────────────
 $pythonCmd = $null
-foreach ($cmd in @("python", "python3", "py")) {
-    if (Get-Command $cmd -ErrorAction SilentlyContinue) {
-        $pythonCmd = $cmd
-        break
-    }
+
+# Priority: py launcher > python > python3
+foreach ($cmd in @("py", "python", "python3")) {
+    try {
+        $ver = & $cmd --version 2>&1
+        if ($LASTEXITCODE -eq 0 -and $ver -match "Python 3") {
+            $pythonCmd = $cmd
+            Write-Host "Found: $ver (using '$cmd')" -ForegroundColor Green
+            break
+        }
+    } catch {}
 }
 
 if ($null -eq $pythonCmd) {
-    Write-Error "Python is not installed or not in PATH. Please install Python 3.8+ from https://www.python.org/downloads/"
+    Write-Error "Python 3.8+ not found. Download from: https://www.python.org/downloads/"
+    Write-Host "Tip: During install, check 'Add Python to PATH'" -ForegroundColor Yellow
     exit 1
 }
 
-$pythonVersion = & $pythonCmd --version 2>&1
-Write-Host "Found: $pythonVersion" -ForegroundColor Green
-
-# Create virtual environment
+# ─────────────────────────────────────────────
+# Step 2: Create Virtual Environment
+# ─────────────────────────────────────────────
 if (Test-Path ".venv") {
     Write-Host "Removing old virtual environment..." -ForegroundColor Yellow
     Remove-Item -Recurse -Force ".venv"
 }
 
 Write-Host "Creating virtual environment..." -ForegroundColor Green
-& $pythonCmd -m venv .venv
+& $pythonCmd -m venv .venv 2>&1
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create virtual environment. Please check your Python installation."
+    Write-Error "Failed to create virtual environment."
     exit 1
 }
 
-# Verify the venv was created correctly
-if (!(Test-Path ".venv\Scripts\python.exe")) {
-    Write-Error "Virtual environment created but python.exe not found inside it. Try running: $pythonCmd -m venv .venv manually."
+# ─────────────────────────────────────────────
+# Step 3: Verify venv (check multiple locations)
+# ─────────────────────────────────────────────
+$pipExe    = $null
+$pythonExe = $null
+
+foreach ($p in @(".venv\Scripts\pip.exe", ".venv\Scripts\pip3.exe")) {
+    if (Test-Path $p) { $pipExe = $p; break }
+}
+foreach ($p in @(".venv\Scripts\python.exe", ".venv\Scripts\python3.exe")) {
+    if (Test-Path $p) { $pythonExe = $p; break }
+}
+
+if ($null -eq $pipExe -and $null -eq $pythonExe) {
+    Write-Error "Virtual environment is incomplete. Your Python may be from the Microsoft Store."
+    Write-Host "" 
+    Write-Host "Fix: Open 'Manage App Execution Aliases' in Windows Settings" -ForegroundColor Yellow
+    Write-Host "     and turn OFF the python.exe / python3.exe Store aliases." -ForegroundColor Yellow
+    Write-Host "     Then reinstall Python from https://www.python.org/downloads/" -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host "Virtual environment created successfully." -ForegroundColor Green
+Write-Host "Virtual environment ready." -ForegroundColor Green
 
-# Upgrade pip
+# ─────────────────────────────────────────────
+# Step 4: Install dependencies
+# ─────────────────────────────────────────────
 Write-Host "Upgrading pip..." -ForegroundColor Green
-& .\.venv\Scripts\python.exe -m pip install --upgrade pip
+if ($pythonExe) {
+    & $pythonExe -m pip install --upgrade pip
+} else {
+    & $pipExe install --upgrade pip
+}
+
+Write-Host "Installing codeScanner..." -ForegroundColor Green
+if ($pythonExe) {
+    & $pythonExe -m pip install -e .
+} else {
+    & $pipExe install -e .
+}
+
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to upgrade pip."
+    Write-Error "Installation failed. Check requirements.txt or pyproject.toml."
     exit 1
 }
 
-# Install project
-Write-Host "Installing codeScanner and its dependencies..." -ForegroundColor Green
-& .\.venv\Scripts\python.exe -m pip install -e .
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to install codeScanner. Check the requirements.txt or pyproject.toml."
-    exit 1
-}
-
+# ─────────────────────────────────────────────
+# Done
+# ─────────────────────────────────────────────
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "  Setup Complete!" -ForegroundColor Cyan
