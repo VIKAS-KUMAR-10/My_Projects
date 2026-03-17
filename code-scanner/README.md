@@ -1,28 +1,80 @@
 # codeScanner 🛡️
 
-**codeScanner** is a language-agnostic Software Supply Chain Security tool designed to identify vulnerable third-party components, analyze dependency exposure, and reduce false positives using reachability heuristics.
+**codeScanner** is a language-agnostic **Software Supply Chain Security** tool that identifies vulnerable third-party components, analyzes dependency exposure, and reduces false positives using reachability heuristics.
 
-Positioned as a **Security & Risk Analysis Utility**, codeScanner provides deep visibility into the actual attack surface of a project, rather than just listing theoretical vulnerabilities.
+> Positioned as a **Security & Risk Analysis Utility**, codeScanner gives you deep visibility into your project's actual attack surface — not just a list of theoretical CVEs.
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Multi-Ecosystem Support** | Detects Python, Node.js, Ruby, Go, Java, and Rust projects automatically |
+| 📦 **SBOM Generation** | Builds a Software Bill of Materials from your dependency manifests |
+| 🗄️ **CVE Intelligence** | Queries the OSV.dev (Google) vulnerability database in real-time |
+| 🎯 **Reachability Analysis** | Filters out noise — only flags vulnerabilities actually used in your code |
+| 🔐 **Secret Detection** | Scans for hardcoded passwords, API keys, and JWT tokens in source files |
+| 🌐 **Static Site Security** | Detects insecure 3rd-party CDN links in HTML files |
+| 📊 **Risk Scoring** | Prioritizes findings by severity (CRITICAL, HIGH, MEDIUM, LOW) |
+| ⚡ **Fast CLI** | Beautiful, readable terminal output powered by Rich |
 
 ---
 
 ## 🔒 Primary Security Objectives
 
-**codeScanner** helps security analysts and researchers answer critical risk questions:
-- **Visibility**: What third-party components exist in this software asset?
-- **Exposure**: Which components contain known vulnerabilities (CVEs)?
-- **Relevance**: Which vulnerabilities are realistically reachable from the source code?
-- **Prioritization**: What is the actual risk-weighted attack surface?
+- **Visibility** — What third-party components exist in this software asset?
+- **Exposure** — Which components contain known vulnerabilities (CVEs)?
+- **Relevance** — Which vulnerabilities are realistically reachable from the source code?
+- **Prioritization** — What is the actual risk-weighted attack surface?
 
 ---
 
-## 🛠️ Functional Security Workflow
+## 🧠 How It Works
 
-1. **Ecosystem Fingerprinting**: Dynamically detects project languages (**Python, Node.js, Ruby, Go, Java, Rust**).
-2. **Component Enumeration**: Automatically parses dependency manifests like `package.json`, `requirements.txt`, and `Gemfile.lock`.
-3. **Vulnerability Intelligence**: Maps components against the **OSV.dev (Google Open Source Vulnerability Database)** for high-fidelity CVE data.
-4. **Reachability Analysis**: Applies language-specific heuristics to determine if vulnerable code is actually imported or referenced.
-5. **Static Site Security**: Scans HTML files for insecure CDN links (jsDelivr, Unpkg).
+```
+Your Project
+     │
+     ▼
+┌─────────────────────────────┐
+│  1. Ecosystem Fingerprinting │  Detects languages from marker files
+│     (package.json, Gemfile,  │  (requirements.txt, go.mod, Cargo.toml...)
+│      requirements.txt, etc.) │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  2. SBOM Generation          │  Enumerates ALL dependencies and their
+│     (Software Bill of        │  exact versions into a structured inventory
+│      Materials)              │
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  3. CVE Lookup               │  For each component in the SBOM, queries
+│     (OSV.dev API)            │  the Google Open Source Vulnerability DB
+│                              │  to find known CVEs (GHSA, CVE IDs)
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  4. Reachability Analysis    │  Checks if the vulnerable package is
+│     (Noise Reduction)        │  actually IMPORTED or CALLED in your code
+│                              │  using language-specific heuristics
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  5. Secret & Sink Detection  │  Scans source files for hardcoded secrets,
+│     (Reconnaissance)         │  dangerous patterns, and insecure CDN links
+└─────────────┬───────────────┘
+              │
+              ▼
+┌─────────────────────────────┐
+│  6. Risk Report              │  Produces a prioritized, high-signal report
+│     (CLI Output)             │  separating reachable vs noise findings
+└─────────────────────────────┘
+```
 
 ---
 
@@ -32,41 +84,63 @@ Positioned as a **Security & Risk Analysis Utility**, codeScanner provides deep 
 - Python 3.8+
 - Git
 
-### Setup
+---
 
-#### 💻 Windows (Recommended)
+### Option A — Clone only this tool (Recommended) ✅
+
+You do **not** need to download the entire `My_Projects` repository.
+Use **sparse checkout** to clone only the `code-scanner` folder:
+
+#### 💻 Windows
 ```powershell
-# 1. Clone the repository
-git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
+# Clone only the code-scanner folder
+git clone --filter=blob:none --sparse https://github.com/VIKAS-KUMAR-10/My_Projects.git
+cd My_Projects
+git sparse-checkout set code-scanner
+cd code-scanner
 
-# 2. Navigate to the code-scanner project
-cd My_Projects\code-scanner
-
-# 3. Run the setup script (creates virtual environment & installs dependencies)
+# Run setup
 .\setup.ps1
 
-# 4. Activate the virtual environment
+# Activate environment
 .\.venv\Scripts\Activate.ps1
 ```
 
 #### 🍎 macOS / 🐧 Linux
 ```bash
-# 1. Clone the repository
-git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
+# Clone only the code-scanner folder
+git clone --filter=blob:none --sparse https://github.com/VIKAS-KUMAR-10/My_Projects.git
+cd My_Projects
+git sparse-checkout set code-scanner
+cd code-scanner
 
-# 2. Navigate to the code-scanner project
-cd My_Projects/code-scanner
-
-# 3. Run the setup script (creates virtual environment & installs dependencies)
+# Run setup
 chmod +x setup.sh && ./setup.sh
 
-# 4. Activate the virtual environment
+# Activate environment
 source .venv/bin/activate
 ```
 
-#### 🛠️ Manual Setup (any OS)
+---
+
+### Option B — Clone the entire repository
 ```bash
+git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
 cd My_Projects/code-scanner
+
+# Windows
+.\setup.ps1
+.\.venv\Scripts\Activate.ps1
+
+# macOS / Linux
+./setup.sh && source .venv/bin/activate
+```
+
+---
+
+### Option C — Manual Install (pip only)
+```bash
+cd code-scanner
 pip install -e .
 ```
 
@@ -74,7 +148,14 @@ pip install -e .
 
 ### Running a Scan
 ```bash
+# Scan a project for vulnerabilities
+codescanner scan /path/to/your/project
+
+# Filter by severity
 codescanner scan /path/to/your/project --severity HIGH
+
+# Get help
+codescanner --help
 ```
 
 ---
@@ -111,13 +192,15 @@ Analyzed Supply Chain: lodash, express, ...
 
 ## 🏗️ Architecture
 
-| Component | Description |
-|-----------|-------------|
-| **Ecosystem Detector** | Fingerprints projects based on marker files |
-| **Dependency Parser** | Native parsers for `npm`, `PyPI`, and `RubyGems` |
-| **Reachability Engine** | Language-specific heuristic analysis (regex & string pattern) |
-| **Intelligence Layer** | Direct integration with OSV.dev REST API |
-| **Reporting Layer** | Professional, high-signal CLI experience via Rich |
+| Component | Role |
+|-----------|------|
+| **Ecosystem Detector** | Fingerprints project type from marker files |
+| **Dependency Parser** | Extracts dependencies from `npm`, `PyPI`, `RubyGems` manifests |
+| **SBOM Builder** | Constructs a structured Software Bill of Materials |
+| **CVE Intelligence** | Queries OSV.dev REST API for vulnerability data |
+| **Reachability Engine** | Applies regex & heuristic analysis to filter noise |
+| **Recon Scanner** | Detects secrets and dangerous code patterns |
+| **Reporting Layer** | Renders professional CLI output via the `Rich` library |
 
 ---
 
