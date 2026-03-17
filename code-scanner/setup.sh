@@ -4,30 +4,59 @@
 
 set -e
 
-echo "🛡️  Starting codeScanner setup..."
+echo "Starting codeScanner setup..."
 
-# Check for Python
-if ! command -v python3 &> /dev/null; then
-    echo "❌ Error: python3 is not installed. Please install Python 3.8+."
+# Check for Python 3.8+
+PYTHON_CMD=""
+for cmd in python3 python; do
+    if command -v "$cmd" &> /dev/null; then
+        PYTHON_CMD="$cmd"
+        break
+    fi
+done
+
+if [ -z "$PYTHON_CMD" ]; then
+    echo "Error: Python 3.8+ is not installed or not in PATH."
+    echo "Please install it from https://www.python.org/downloads/"
     exit 1
 fi
 
-# Create virtual environment if it doesn't exist
-if [ ! -d ".venv" ]; then
-    echo "📦 Creating virtual environment..."
-    python3 -m venv .venv
-else
-    echo "✅ Virtual environment already exists."
+echo "Found: $($PYTHON_CMD --version)"
+
+# Remove old venv if it exists to ensure a clean install
+if [ -d ".venv" ]; then
+    echo "Removing old virtual environment..."
+    rm -rf .venv
 fi
 
-# Install dependencies
-echo "⚙️  Installing dependencies and project in editable mode..."
-./.venv/bin/pip install --upgrade pip
-./.venv/bin/pip install -e .
+# Create virtual environment
+echo "Creating virtual environment..."
+$PYTHON_CMD -m venv .venv
+
+# Verify the venv was created
+if [ ! -f ".venv/bin/python" ]; then
+    echo "Error: Virtual environment creation failed. Check your Python installation."
+    exit 1
+fi
+
+echo "Virtual environment created successfully."
+
+# Upgrade pip
+echo "Upgrading pip..."
+./.venv/bin/python -m pip install --upgrade pip
+
+# Install project
+echo "Installing codeScanner and its dependencies..."
+./.venv/bin/python -m pip install -e .
 
 echo ""
-echo "✨ Setup Complete!"
-echo "To use codeScanner, activate the environment with:"
+echo "============================================"
+echo "  Setup Complete!"
+echo "============================================"
+echo ""
+echo "Activate the virtual environment:"
 echo "    source .venv/bin/activate"
+echo ""
 echo "Then run:"
 echo "    codescanner --help"
+echo ""
