@@ -1,31 +1,31 @@
 # 👾 My Projects
 
-A centralized portfolio repository containing various tools and applications I have built — focused on **cybersecurity**, **automation**, and **developer tooling**.
+A centralized portfolio repository containing various specialized tools and security utilities. 
+
+> **Note**: This is a mono-repo. You can choose to clone the entire repository or use Git's **sparse-checkout** to download only a specific tool to save space and time.
 
 ---
 
-## 📁 Projects
+## 🛠️ Project List
 
-| # | Project | Description | Status |
-|---|---------|-------------|--------|
-| 1 | [code-scanner](./code-scanner) | Language-agnostic Software Supply Chain Security tool | ✅ Active |
+| # | Tool | Description | Status |
+|---|------|-------------|--------|
+| 1 | [🛡️ code-scanner](./code-scanner) | Supply Chain Security & Reachability Analysis | ✅ Stable |
 
 ---
 
-##  code-scanner
+## 📦 How to Clone (Optimized)
 
-> A powerful security analysis tool that scans your project dependencies for known CVEs and reduces false positives using reachability heuristics.
+If you only want a specific tool (e.g., `code-scanner`) without downloading everything else:
 
-**Quick Start:**
 ```bash
-git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
-cd My_Projects/code-scanner
-.\setup.ps1   # Windows
-# OR
-./setup.sh    # macOS / Linux
-```
+# 1. Initialize a sparse clone
+git clone --filter=blob:none --sparse https://github.com/VIKAS-KUMAR-10/My_Projects.git
+cd My_Projects
 
-👉 **[View full documentation & setup guide →](./code-scanner/README.md)**
+# 2. Pull only the tool you need
+git sparse-checkout set code-scanner
+```
 
 ---
 

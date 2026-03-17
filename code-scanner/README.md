@@ -1,209 +1,86 @@
 # codeScanner 🛡️
 
-**codeScanner** is a language-agnostic **Software Supply Chain Security** tool that identifies vulnerable third-party components, analyzes dependency exposure, and reduces false positives using reachability heuristics.
-
-> Positioned as a **Security & Risk Analysis Utility**, codeScanner gives you deep visibility into your project's actual attack surface — not just a list of theoretical CVEs.
+**codeScanner** is a sophisticated **Software Supply Chain Security** utility designed for deep security analysis. It doesn't just list vulnerabilities; it maps them against your actual code usage to determine **real risk**.
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-| Feature | Description |
-|---------|-------------|
-| 🔍 **Multi-Ecosystem Support** | Detects Python, Node.js, Ruby, Go, Java, and Rust projects automatically |
-| 📦 **SBOM Generation** | Builds a Software Bill of Materials from your dependency manifests |
-| 🗄️ **CVE Intelligence** | Queries the OSV.dev (Google) vulnerability database in real-time |
-| 🎯 **Reachability Analysis** | Filters out noise — only flags vulnerabilities actually used in your code |
-| 🔐 **Secret Detection** | Scans for hardcoded passwords, API keys, and JWT tokens in source files |
-| 🌐 **Static Site Security** | Detects insecure 3rd-party CDN links in HTML files |
-| 📊 **Risk Scoring** | Prioritizes findings by severity (CRITICAL, HIGH, MEDIUM, LOW) |
-| ⚡ **Fast CLI** | Beautiful, readable terminal output powered by Rich |
+- **Language-Agnostic Engine**: Support for Python, Node.js, Ruby, Go, Java, and Rust.
+- **Dynamic SBOM Generation**: Automatically compiles a detailed Software Bill of Materials.
+- **Reachability Heuristics**: Automatically filters out "noise" vulnerabilities that are present in your vendor folder but never actually called by your code.
+- **Vulnerability Intelligence**: Direct integration with the **OSV.dev** database for high-fidelity security data.
+- **Secret & Danger Scanning**: Detects hardcoded credentials (API keys, tokens) and dangerous coding patterns (sinks).
+- **Static Asset Security**: Scans HTML files for compromised or insecure CDN-hosted script tags.
 
 ---
 
-## 🔒 Primary Security Objectives
+## 🧠 How It Works (The Security Pipeline)
 
-- **Visibility** — What third-party components exist in this software asset?
-- **Exposure** — Which components contain known vulnerabilities (CVEs)?
-- **Relevance** — Which vulnerabilities are realistically reachable from the source code?
-- **Prioritization** — What is the actual risk-weighted attack surface?
-
----
-
-## 🧠 How It Works
-
-```
-Your Project
-     │
-     ▼
-┌─────────────────────────────┐
-│  1. Ecosystem Fingerprinting │  Detects languages from marker files
-│     (package.json, Gemfile,  │  (requirements.txt, go.mod, Cargo.toml...)
-│      requirements.txt, etc.) │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│  2. SBOM Generation          │  Enumerates ALL dependencies and their
-│     (Software Bill of        │  exact versions into a structured inventory
-│      Materials)              │
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│  3. CVE Lookup               │  For each component in the SBOM, queries
-│     (OSV.dev API)            │  the Google Open Source Vulnerability DB
-│                              │  to find known CVEs (GHSA, CVE IDs)
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│  4. Reachability Analysis    │  Checks if the vulnerable package is
-│     (Noise Reduction)        │  actually IMPORTED or CALLED in your code
-│                              │  using language-specific heuristics
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│  5. Secret & Sink Detection  │  Scans source files for hardcoded secrets,
-│     (Reconnaissance)         │  dangerous patterns, and insecure CDN links
-└─────────────┬───────────────┘
-              │
-              ▼
-┌─────────────────────────────┐
-│  6. Risk Report              │  Produces a prioritized, high-signal report
-│     (CLI Output)             │  separating reachable vs noise findings
-└─────────────────────────────┘
+```mermaid
+graph TD
+    A[Project Manifests] -->|Parsing| B(SBOM Generation)
+    B -->|Querying| C(OSV.dev Database)
+    C -->|CVE Mapping| D{Reachability Engine}
+    D -->|Used in Code| E[CRITICAL Findings]
+    D -->|Not Used| F[Noise/Low Risk]
+    G[Source Code Scan] -->|Regex/Sinks| H[Secret Detection]
+    E & H --> I[Final Security Report]
 ```
 
+### 1. SBOM (Software Bill of Materials)
+The tool starts by fingerprinting your project's ecosystem. It parses files like `package.json`, `requirements.txt`, or `go.mod` to create a structured inventory of every third-party component you are using.
+
+### 2. CVE Mapping & Intelligence
+Every component identified in the SBOM is checked against global vulnerability databases to identify known CVEs, severity ratings, and patch versions.
+
+### 3. Reachability Heuristics (The Filter)
+Typical scanners produce too many "false positives." **codeScanner** uses language-specific heuristics to check if the vulnerable parts of a library are actually **imported** or **invoked** in your source files. This allows security teams to focus on reachable exploits first.
+
 ---
 
-## 🚀 Installation & Usage
+## 🚀 Installation & Usage (Linux/macOS)
 
 ### Prerequisites
 - Python 3.8+
 - Git
 
----
-
-### Option A — Clone only this tool (Recommended) ✅
-
-You do **not** need to download the entire `My_Projects` repository.
-Use **sparse checkout** to clone only the `code-scanner` folder:
-
-#### 💻 Windows
-```powershell
-# Clone only the code-scanner folder
-git clone --filter=blob:none --sparse https://github.com/VIKAS-KUMAR-10/My_Projects.git
-cd My_Projects
-git sparse-checkout set code-scanner
-cd code-scanner
-
-# Run setup
-.\setup.ps1
-
-# Activate environment
-.\.venv\Scripts\Activate.ps1
-```
-
-#### 🍎 macOS / 🐧 Linux
+### Setup
 ```bash
-# Clone only the code-scanner folder
+# Clone the repository (Sparse mode recommended)
 git clone --filter=blob:none --sparse https://github.com/VIKAS-KUMAR-10/My_Projects.git
 cd My_Projects
 git sparse-checkout set code-scanner
 cd code-scanner
 
-# Run setup
-chmod +x setup.sh && ./setup.sh
+# Run the automated setup script
+chmod +x setup.sh
+./setup.sh
 
-# Activate environment
+# Activate the environment
 source .venv/bin/activate
 ```
 
----
-
-### Option B — Clone the entire repository
-```bash
-git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
-cd My_Projects/code-scanner
-
-# Windows
-.\setup.ps1
-.\.venv\Scripts\Activate.ps1
-
-# macOS / Linux
-./setup.sh && source .venv/bin/activate
-```
-
----
-
-### Option C — Manual Install (pip only)
-```bash
-cd code-scanner
-pip install -e .
-```
-
----
-
 ### Running a Scan
 ```bash
-# Scan a project for vulnerabilities
-codescanner scan /path/to/your/project
+# Basic scan
+codescanner scan /path/to/project
 
-# Filter by severity
-codescanner scan /path/to/your/project --severity HIGH
-
-# Get help
-codescanner --help
+# Severity filtered scan
+codescanner scan /path/to/project --severity HIGH
 ```
 
 ---
 
-## 📊 Sample Output
+## 🏗️ Technical Architecture
 
-```text
-╭───────────────────────────────────────────────────────╮
-│ codeScanner v0.2.1 - Security & Risk Analysis Utility │
-│ Project Target: /home/user/my-project                │
-╰───────────────────────────────────────────────────────╯
-Detected Ecosystems: Node.js
-Analyzed Supply Chain: lodash, express, ...
-
-=== Reachable Vulnerabilities ===
-✔ lodash (4.17.15) (HIGH / GHSA-29mw-wpgm-hmr9)
-  ↳ Regular Expression Denial of Service (ReDoS) in lodash
-
-=== Lower-Confidence / Noise Findings ===
-✘ express (4.16.0) (MEDIUM / GHSA-xxxx-xxxx)
-
-╭─ === Security Analysis Metrics === ───╮
-│                                       │
-│  Total Found       : 2                │
-│  Likely Reachable  : 1                │
-│  Noise Filtered    : 1                │
-│  -----------------------------------  │
-│  Prioritization Gain: 50.0%           │
-│                                       │
-╰───────────────────────────────────────╯
-```
-
----
-
-## 🏗️ Architecture
-
-| Component | Role |
-|-----------|------|
-| **Ecosystem Detector** | Fingerprints project type from marker files |
-| **Dependency Parser** | Extracts dependencies from `npm`, `PyPI`, `RubyGems` manifests |
-| **SBOM Builder** | Constructs a structured Software Bill of Materials |
-| **CVE Intelligence** | Queries OSV.dev REST API for vulnerability data |
-| **Reachability Engine** | Applies regex & heuristic analysis to filter noise |
-| **Recon Scanner** | Detects secrets and dangerous code patterns |
-| **Reporting Layer** | Renders professional CLI output via the `Rich` library |
+- **Detector**: Fingerprints projects via marker files.
+- **Parsers**: Native manifest handlers for multiple package managers.
+- **Engine**: Core logic for Reachability and Pattern matching.
+- **API Caller**: Asynchronous intelligence gathering from OSV.dev.
+- **UI**: High-signal CLI reporting via the `Rich` framework.
 
 ---
 
 ## 🤝 Contributing
-
-Designed for extensibility. See [`DESIGN.md`](./DESIGN.md) for information on adding new language analyzers or integration feeds.
+For internal architecture details or adding new language support, see [`DESIGN.md`](./DESIGN.md).
