@@ -48,11 +48,7 @@ if ($null -eq $pythonCmd) {
 
 if ($null -eq $pythonCmd) {
     Write-Error "No valid Python 3.8+ found."
-    Write-Host ""
-    Write-Host "Options:" -ForegroundColor Yellow
-    Write-Host "  1. Install Python from: https://www.python.org/downloads/" -ForegroundColor Yellow
-    Write-Host "     (check 'Add Python to PATH' during install)" -ForegroundColor Yellow
-    Write-Host "  2. If using MSYS2: pacman -S mingw-w64-ucrt-x86_64-python" -ForegroundColor Yellow
+    Write-Host "Options: Install Python from https://www.python.org/downloads/ (check 'Add Python to PATH')" -ForegroundColor Yellow
     exit 1
 }
 
@@ -73,30 +69,36 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ─────────────────────────────────────────────
-# Step 3: Verify venv
+# Step 3: Verify venv (handle Windows vs Unix/MSYS2 structure)
 # ─────────────────────────────────────────────
 $venvPython = $null
-foreach ($p in @(".venv\Scripts\python.exe", ".venv\Scripts\python3.exe")) {
-    if (Test-Path $p) { $venvPython = $p; break }
+$venvBinDir = $null
+
+# Search for python executable in both Scripts (Win) and bin (Unix/MSYS2)
+foreach ($dir in @("Scripts", "bin")) {
+    foreach ($exe in @("python.exe", "python3.exe", "python")) {
+        $path = Join-Path ".venv" (Join-Path $dir $exe)
+        if (Test-Path $path) {
+            $venvPython = $path
+            $venvBinDir = Join-Path ".venv" $dir
+            break
+        }
+    }
+    if ($venvPython) { break }
 }
 
-$venvPip = $null
-foreach ($p in @(".venv\Scripts\pip.exe", ".venv\Scripts\pip3.exe")) {
-    if (Test-Path $p) { $venvPip = $p; break }
-}
-
-if ($null -eq $venvPython -and $null -eq $venvPip) {
-    Write-Error "Virtual environment is incomplete."
+if ($null -eq $venvPython) {
+    Write-Error "Virtual environment is incomplete. Python executable not found in .venv/Scripts or .venv/bin."
+    Write-Host "Structure of .venv:" -ForegroundColor Gray
+    Get-ChildItem -Path ".venv" -Recurse | Select-Object -First 20 | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor Gray }
     exit 1
 }
 
-Write-Host "Virtual environment ready." -ForegroundColor Green
+Write-Host "Virtual environment ready at $venvBinDir" -ForegroundColor Green
 
 # ─────────────────────────────────────────────
 # Step 4: Install dependencies
 # ─────────────────────────────────────────────
-$runner = if ($venvPython) { $venvPython } else { $venvPip }
-
 Write-Host "Upgrading pip..." -ForegroundColor Green
 & $venvPython -m pip install --upgrade pip
 
@@ -116,8 +118,13 @@ Write-Host "============================================" -ForegroundColor Cyan
 Write-Host "  Setup Complete!" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Activate the virtual environment:" -ForegroundColor White
-Write-Host "    .\.venv\Scripts\Activate.ps1" -ForegroundColor Yellow
+Write-Host "To use codeScanner, activate the environment:" -ForegroundColor White
+if (Test-Path (Join-Path $venvBinDir "Activate.ps1")) {
+    Write-Host "    $venvBinDir\Activate.ps1" -ForegroundColor Yellow
+} elseif (Test-Path (Join-Path $venvBinDir "activate")) {
+    Write-Host "    source $venvBinDir/activate" -ForegroundColor Yellow
+}
+
 Write-Host ""
 Write-Host "Then run:" -ForegroundColor White
 Write-Host "    codescanner --help" -ForegroundColor Yellow
