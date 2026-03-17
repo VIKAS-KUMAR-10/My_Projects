@@ -35,16 +35,28 @@ Positioned as a **Security & Risk Analysis Utility**, codeScanner provides deep 
 
 #### 💻 Windows (Recommended)
 ```powershell
-git clone https://github.com/yourusername/code-scanner.git
-cd code-scanner
+# 1. Clone the repository
+git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
+
+# 2. Navigate to the code-scanner project
+cd My_Projects/code-scanner
+
+# 3. Run the setup script
 .\setup.ps1
+
+# 4. Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
 ```
 
 #### 🍎 macOS / 🐧 Linux
 ```bash
-git clone https://github.com/yourusername/code-scanner.git
-cd code-scanner
+# 1. Clone the repository
+git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
+
+# 2. Navigate to the code-scanner project
+cd My_Projects/code-scanner
+
+# 3. Setup and Activate
 chmod +x setup.sh
 ./setup.sh
 source .venv/bin/activate
@@ -52,6 +64,7 @@ source .venv/bin/activate
 
 #### 🛠️ Manual Setup
 ```bash
+cd My_Projects/code-scanner
 pip install -e .
 ```
 
