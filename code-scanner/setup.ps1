@@ -99,14 +99,28 @@ Write-Host "Virtual environment ready at $venvBinDir" -ForegroundColor Green
 # ─────────────────────────────────────────────
 # Step 4: Install dependencies
 # ─────────────────────────────────────────────
-Write-Host "Upgrading pip..." -ForegroundColor Green
-& $venvPython -m pip install --upgrade pip
+# Upgrade build tools first
+Write-Host "Upgrading build tools (pip, setuptools, wheel)..." -ForegroundColor Green
+& $venvPython -m pip install --upgrade pip setuptools wheel
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to upgrade build tools."
+    exit 1
+}
 
+# Install project
 Write-Host "Installing codeScanner..." -ForegroundColor Green
 & $venvPython -m pip install -e .
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Installation failed."
+    Write-Host ""
+    Write-Host "------------------------------------------------------------" -ForegroundColor Red
+    Write-Host "ERROR: Installation failed!" -ForegroundColor Red
+    Write-Host "This usually happens because MSYS2 Python is trying to build" -ForegroundColor Yellow
+    Write-Host "pydantic/rust from source and failing." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "FIX: Please install the official Python from python.org" -ForegroundColor Cyan
+    Write-Host "     (ensure 'Add Python to PATH' is checked during install)." -ForegroundColor Cyan
+    Write-Host "------------------------------------------------------------" -ForegroundColor Red
     exit 1
 }
 
