@@ -1,28 +1,58 @@
 # codeScanner Setup Script for Windows
-# Handles standard Python installs and Windows Store Python
+# Handles standard Python, Windows Store Python, and MSYS2/MinGW Python
 
 Write-Host "Starting codeScanner setup..." -ForegroundColor Cyan
 
 # ─────────────────────────────────────────────
-# Step 1: Find a working Python executable
+# Step 1: Find a REAL working Python executable
+# (skip Windows Store stubs)
 # ─────────────────────────────────────────────
 $pythonCmd = $null
 
-# Priority: py launcher > python > python3
-foreach ($cmd in @("py", "python", "python3")) {
-    try {
-        $ver = & $cmd --version 2>&1
-        if ($LASTEXITCODE -eq 0 -and $ver -match "Python 3") {
-            $pythonCmd = $cmd
-            Write-Host "Found: $ver (using '$cmd')" -ForegroundColor Green
+# Known real Python paths to check first (bypasses Store alias)
+$knownPaths = @(
+    "C:\msys64\ucrt64\bin\python.exe",
+    "C:\msys64\usr\bin\python3.exe",
+    "C:\Python312\python.exe",
+    "C:\Python311\python.exe",
+    "C:\Python310\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python310\python.exe"
+)
+
+foreach ($path in $knownPaths) {
+    if (Test-Path $path) {
+        $ver = & $path --version 2>&1
+        if ($ver -match "Python 3") {
+            $pythonCmd = $path
+            Write-Host "Found: $ver (at $path)" -ForegroundColor Green
             break
         }
-    } catch {}
+    }
+}
+
+# Fallback: try py launcher, then python (if not Store stub)
+if ($null -eq $pythonCmd) {
+    foreach ($cmd in @("py", "python3")) {
+        try {
+            $ver = & $cmd --version 2>&1
+            if ($LASTEXITCODE -eq 0 -and $ver -match "Python 3") {
+                $pythonCmd = $cmd
+                Write-Host "Found: $ver (using '$cmd')" -ForegroundColor Green
+                break
+            }
+        } catch {}
+    }
 }
 
 if ($null -eq $pythonCmd) {
-    Write-Error "Python 3.8+ not found. Download from: https://www.python.org/downloads/"
-    Write-Host "Tip: During install, check 'Add Python to PATH'" -ForegroundColor Yellow
+    Write-Error "No valid Python 3.8+ found."
+    Write-Host ""
+    Write-Host "Options:" -ForegroundColor Yellow
+    Write-Host "  1. Install Python from: https://www.python.org/downloads/" -ForegroundColor Yellow
+    Write-Host "     (check 'Add Python to PATH' during install)" -ForegroundColor Yellow
+    Write-Host "  2. If using MSYS2: pacman -S mingw-w64-ucrt-x86_64-python" -ForegroundColor Yellow
     exit 1
 }
 
@@ -43,24 +73,20 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ─────────────────────────────────────────────
-# Step 3: Verify venv (check multiple locations)
+# Step 3: Verify venv
 # ─────────────────────────────────────────────
-$pipExe    = $null
-$pythonExe = $null
-
-foreach ($p in @(".venv\Scripts\pip.exe", ".venv\Scripts\pip3.exe")) {
-    if (Test-Path $p) { $pipExe = $p; break }
-}
+$venvPython = $null
 foreach ($p in @(".venv\Scripts\python.exe", ".venv\Scripts\python3.exe")) {
-    if (Test-Path $p) { $pythonExe = $p; break }
+    if (Test-Path $p) { $venvPython = $p; break }
 }
 
-if ($null -eq $pipExe -and $null -eq $pythonExe) {
-    Write-Error "Virtual environment is incomplete. Your Python may be from the Microsoft Store."
-    Write-Host "" 
-    Write-Host "Fix: Open 'Manage App Execution Aliases' in Windows Settings" -ForegroundColor Yellow
-    Write-Host "     and turn OFF the python.exe / python3.exe Store aliases." -ForegroundColor Yellow
-    Write-Host "     Then reinstall Python from https://www.python.org/downloads/" -ForegroundColor Yellow
+$venvPip = $null
+foreach ($p in @(".venv\Scripts\pip.exe", ".venv\Scripts\pip3.exe")) {
+    if (Test-Path $p) { $venvPip = $p; break }
+}
+
+if ($null -eq $venvPython -and $null -eq $venvPip) {
+    Write-Error "Virtual environment is incomplete."
     exit 1
 }
 
@@ -69,22 +95,16 @@ Write-Host "Virtual environment ready." -ForegroundColor Green
 # ─────────────────────────────────────────────
 # Step 4: Install dependencies
 # ─────────────────────────────────────────────
+$runner = if ($venvPython) { $venvPython } else { $venvPip }
+
 Write-Host "Upgrading pip..." -ForegroundColor Green
-if ($pythonExe) {
-    & $pythonExe -m pip install --upgrade pip
-} else {
-    & $pipExe install --upgrade pip
-}
+& $venvPython -m pip install --upgrade pip
 
 Write-Host "Installing codeScanner..." -ForegroundColor Green
-if ($pythonExe) {
-    & $pythonExe -m pip install -e .
-} else {
-    & $pipExe install -e .
-}
+& $venvPython -m pip install -e .
 
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "Installation failed. Check requirements.txt or pyproject.toml."
+    Write-Error "Installation failed."
     exit 1
 }
 
