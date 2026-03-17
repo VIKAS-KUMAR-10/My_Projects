@@ -1,24 +1,33 @@
-# My Projects
+# 👾 My Projects
 
-Welcome to my personal projects repository. This repository serves as a centralized location for various tools and applications I am developing.
-
-## Current Projects
-
-### 🛠️ [Code Scanner](./code-scanner)
-A powerful and flexible code analysis tool designed to scan repositories for security vulnerabilities, code smells, and technical debt.
-
-#### Features:
-- Security scanning
-- Performance analysis
-- Best practices check
-- Customizable rules
+A centralized portfolio repository containing various tools and applications I have built — focused on **cybersecurity**, **automation**, and **developer tooling**.
 
 ---
 
-## How to use this repository
-Each project is contained within its own directory. Please navigate to the specific project folder for detailed instructions on how to set up and run that particular tool.
+## 📁 Projects
 
-## Author
-**VIKAS-KUMAR-10**
-- GitHub: [VIKAS-KUMAR-10](https://github.com/VIKAS-KUMAR-10)
-- Email: [vikaskumarnsk@gmail.com](mailto:vikaskumarnsk@gmail.com)
+| # | Project | Description | Status |
+|---|---------|-------------|--------|
+| 1 | [🛡️ code-scanner](./code-scanner) | Language-agnostic Software Supply Chain Security tool | ✅ Active |
+
+---
+
+## 🛡️ code-scanner
+
+> A powerful security analysis tool that scans your project dependencies for known CVEs and reduces false positives using reachability heuristics.
+
+**Quick Start:**
+```bash
+git clone https://github.com/VIKAS-KUMAR-10/My_Projects.git
+cd My_Projects/code-scanner
+.\setup.ps1   # Windows
+# OR
+./setup.sh    # macOS / Linux
+```
+
+👉 **[View full documentation & setup guide →](./code-scanner/README.md)**
+
+---
+
+## 🔗 Author
+**[VIKAS-KUMAR-10](https://github.com/VIKAS-KUMAR-10)**
