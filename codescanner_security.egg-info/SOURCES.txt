@@ -1,0 +1,12 @@
+LICENSE
+README.md
+pyproject.toml
+codescanner/engine.py
+codescanner/main.py
+codescanner/styles.py
+codescanner_security.egg-info/PKG-INFO
+codescanner_security.egg-info/SOURCES.txt
+codescanner_security.egg-info/dependency_links.txt
+codescanner_security.egg-info/entry_points.txt
+codescanner_security.egg-info/requires.txt
+codescanner_security.egg-info/top_level.txt
