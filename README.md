@@ -8,11 +8,11 @@ A centralized portfolio repository containing various tools and applications I h
 
 | # | Project | Description | Status |
 |---|---------|-------------|--------|
-| 1 | [🛡️ code-scanner](./code-scanner) | Language-agnostic Software Supply Chain Security tool | ✅ Active |
+| 1 | [code-scanner](./code-scanner) | Language-agnostic Software Supply Chain Security tool | ✅ Active |
 
 ---
 
-## 🛡️ code-scanner
+##  code-scanner
 
 > A powerful security analysis tool that scans your project dependencies for known CVEs and reduces false positives using reachability heuristics.
 
