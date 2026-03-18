@@ -72,6 +72,36 @@ codescanner scan /path/to/project --severity HIGH
 
 ---
 
+## 📊 Sample Output
+
+```text
+╭───────────────────────────────────────────────────────╮
+│ codeScanner v0.2.1 - Security & Risk Analysis Utility │
+│ Project Target: /home/user/my-project                │
+╰───────────────────────────────────────────────────────╯
+Detected Ecosystems: Node.js
+Analyzed Supply Chain: lodash, express, ...
+
+=== Reachable Vulnerabilities ===
+✔ lodash (4.17.15) (HIGH / GHSA-29mw-wpgm-hmr9)
+  ↳ Regular Expression Denial of Service (ReDoS) in lodash
+
+=== Lower-Confidence / Noise Findings ===
+✘ express (4.16.0) (MEDIUM / GHSA-xxxx-xxxx)
+
+╭─ === Security Analysis Metrics === ───╮
+│                                       │
+│  Total Found       : 2                │
+│  Likely Reachable  : 1                │
+│  Noise Filtered    : 1                │
+│  -----------------------------------  │
+│  Prioritization Gain: 50.0%           │
+│                                       │
+╰───────────────────────────────────────╯
+```
+
+---
+
 ## 🏗️ Technical Architecture
 
 - **Detector**: Fingerprints projects via marker files.
