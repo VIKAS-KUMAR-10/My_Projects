@@ -12,6 +12,7 @@ A centralized engineering portfolio containing specialized security tools, autom
 
 ## 🛠️ Project Showcase
 
+<<<<<<< HEAD
 | # | Project | Description | Core Tech | Status |
 |---|---------|-------------|-----------|--------|
 | 1 | [🛡️ Flux-Scanner](https://github.com/VIKAS-KUMAR-10/Flux-Scanner) | Sophisticated Supply Chain Security & Reachability Analysis. | Python, OSV API | ✅ Stable (v1.0.0) |
@@ -25,6 +26,11 @@ I am actively building the following utilities:
 - **🔐 Glint-Auth**: A minimalist, zero-dependency authentication library for microservices.
 - **🛰️ Pulse-Metrics**: A real-time monitoring engine with sub-second latency for Python applications.
 - **📦 Pack-Master**: An automated CI/CD helper for managing complex monorepo versioning.
+=======
+| # | Tool | Description | Status |
+|---|------|-------------|--------|
+| 1 | [Flux-Scanner](https://github.com/VIKAS-KUMAR-10/Flux-Scanner) | Supply Chain Security & Reachability Analysis | ✅ Stable (v1.0.0) |
+>>>>>>> b4d1f2762e06bfda03e65c0d4b1eeaca3c0feb37
 
 ---
 
