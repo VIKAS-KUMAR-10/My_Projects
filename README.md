@@ -8,7 +8,7 @@ A centralized portfolio repository containing various specialized tools and secu
 
 | # | Tool | Description | Status |
 |---|------|-------------|--------|
-| 1 | [🛡️ Flux-Scanner](https://github.com/VIKAS-KUMAR-10/Flux-Scanner) | Supply Chain Security & Reachability Analysis | ✅ Stable (v1.0.0) |
+| 1 | [Flux-Scanner](https://github.com/VIKAS-KUMAR-10/Flux-Scanner) | Supply Chain Security & Reachability Analysis | ✅ Stable (v1.0.0) |
 
 ---
 
